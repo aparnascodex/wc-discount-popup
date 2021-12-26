@@ -68,13 +68,14 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         		$defaults = ['products'  => ''];
         		$options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
         		$selected_product = $options['products'];
+        		
         		$type = $options['type'];
         		$products = get_posts( ['post_type'   => 'product', 
         							'post_status' => 'publish',
         							'numberposts' => -1 ] );
 	        	$product_options = [];
 	        	foreach( $products as $product ) {
-	        		$selected = $product->ID == $selected_product? true: false;
+	        		$selected = in_array( $product->ID, $selected_product )? true: false;
 
 	        		$product_options[] = ['type'   => 'option',
 	        							'label'    => $product->post_title,

@@ -50,6 +50,7 @@ if ( ! class_exists( 'Popup' ) ) {
             wp_enqueue_script( 'popup-js', POPUP_PLUGIN_URL. 'assets/js/popup.js', ['jquery'] );
             wp_localize_script( 'popup-js', 'popup', [ 'options' => $options, 'display' => $render_popup, 'url' => admin_url( 'admin-ajax.php' )] );
             ?>
+            <section class="modal container">
             <div class="modal__container" id="popup-container">
                 <div class="modal__content">
                     <div class="modal__close close-modal" title="Close">
@@ -68,6 +69,7 @@ if ( ! class_exists( 'Popup' ) ) {
                     </button>
                 </div>
             </div>
+            </section>
             <?php
             
         }
@@ -111,7 +113,7 @@ if ( ! class_exists( 'Popup' ) ) {
                         $render_popup = 1;
                     }
                 }
-                elseif( $options['type'] == 1 ) {
+                elseif( $options['type'] == 2 ) {
                     $products = $options['products'];
                     $product_ids = wp_list_pluck( WC()->cart->get_cart_contents(), 'product_id' );
                     $common = array_intersect( $products, $product_ids );
