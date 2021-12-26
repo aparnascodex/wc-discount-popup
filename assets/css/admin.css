@@ -1,0 +1,31 @@
+.heading {
+	background-color: #fff;
+	padding: 20px;
+	margin: 0px;
+}
+.content {
+	width: 80%;
+	margin: 40px auto;
+	background-color: #fff;
+	border: 1px solid rgb(226, 228, 231);
+}
+.field-section {
+	padding: 20px;
+	border-bottom: 1px solid rgb(226, 228, 231);
+}
+.field-section label {
+	width: 20%;
+	font-weight: 600;
+	font-size: 14px;
+	display:  inline-block;
+
+}
+.field-section select, .field-section input[type='number']{
+	padding: 8px;
+	border-radius: 0px;
+	min-width: 30%;
+}
+.field-section input[type='submit'] {
+	padding: 6px 10px; 
+	font-weight: 600;
+}
