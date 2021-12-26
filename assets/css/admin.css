@@ -29,3 +29,22 @@
 	padding: 6px 10px; 
 	font-weight: 600;
 }
+.hide_field {
+	display: none;
+}
+.field-product input[type='radio'] {
+	display: none;
+}
+.field-product .sol-container {
+	width: 30% !important;
+	display: inline-block;
+}
+.field-product .sol-inner-container{
+	border-radius: 0px;
+	padding: 6px 10px; 
+}
+.field-product .sol-label {
+	width: 95% !important;
+	border-bottom: 1px solid rgb(226, 228, 231);
+	padding: 10px 0px; 
+}

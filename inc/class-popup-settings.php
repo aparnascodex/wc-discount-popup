@@ -21,7 +21,6 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
             if ( null === self::$instance ) {
                 self::$instance = new self();
             }
-
             return self::$instance;
         }
 
@@ -53,6 +52,28 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         public function include_popup_settings_script( $hook ) {
         	if( $hook === 'woocommerce_page_wc-popup-settings' ) {
         		wp_enqueue_style( 'popup-admin-css', POPUP_PLUGIN_URL. 'assets/css/admin.css' );
+        		wp_enqueue_style( 'sol-css', POPUP_PLUGIN_URL. 'assets/css/sol.css' );
+        		wp_enqueue_script( 'sol-js', POPUP_PLUGIN_URL. 'assets/js/sol.js', ['jquery'] );
+        		wp_enqueue_script( 'popup-admin-js', POPUP_PLUGIN_URL. 'assets/js/admin.js', ['jquery', 'sol-js'] );
+        		$defaults = ['products'  => ''];
+        		$options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
+        		$selected_product = $options['products'];
+        		$type = $options['type'];
+        		$products = get_posts( ['post_type'   => 'product', 
+        							'post_status' => 'publish',
+        							'numberposts' => -1 ] );
+	        	$product_options = [];
+	        	foreach( $products as $product ) {
+	        		$selected = $product->ID == $selected_product? true: false;
+
+	        		$product_options[] = ['type'   => 'option',
+	        							'label'    => $product->post_title,
+	        							'value'    => $product->ID,
+	        							'selected' => $selected
+	        							];
+	        	}
+	        	
+	        	wp_localize_script( 'popup-admin-js', 'opts', ['products' => $product_options] );
         	}
         }
         public function wc_popup_settings() {
@@ -63,6 +84,7 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         				'products'  => ''
         			];
         	$options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
+        	$type = $options['type'];
         	
         	?>
         	<div class='popup-settings'>
@@ -76,7 +98,7 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
 	        			<div class='field-section'>
 	        				<label><?php _e( 'Display Popup', 'wc-popups' ) ?></label>
 	        				
-	    					<select name="wc_popup_setting[display]">
+	    					<select name="wc_popup_setting[display]" >
 	    						
 	    						<option value='1' <?php echo selected( 1, $options['display'], false ); ?>>
 	    							<?php _e( 'Show', 'wc-popups' ) ?>
@@ -87,24 +109,24 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
 	    					</select>
 	        				
 	        			</div>
-	        			<div class='field-section'>
+	        			<div class='field-section field-type'>
 	        				<label><?php _e( 'Popup Type', 'wc-popups' ) ?></label>
 	        				
-	    					<select name="wc_popup_setting[type]">
+	    					<select name="wc_popup_setting[type]" class='type'>
 	    						
-	    						<option value='0' <?php echo selected( 0, $options['type'], false ); ?>>
+	    						<option value='0' <?php echo selected( 0, $type, false ); ?>>
 	    							<?php _e( 'Cart Totals', 'wc-popups' ) ?>
 	    						</option>
-	    						<option value='1' <?php echo selected( 1, $options['type'], false ); ?>>
+	    						<option value='1' <?php echo selected( 1, $type, false ); ?>>
 	    							<?php _e( 'Number of items in Cart', 'wc-popups' ) ?>
 	    						</option>
-	    						<option value='2' <?php echo selected( 2, $options['type'], false ); ?>>
+	    						<option value='2' <?php echo selected( 2, $type, false ); ?>>
 	    							<?php _e( 'Products in Cart', 'wc-popups' ) ?>
 	    						</option>
 	    					</select>
 	        				
 	        			</div>
-	        			<div class='field-section'>
+	        			<div class="field-section field-condition <?php echo $type == 2? 'hide_field': ''; ?>">
 	        				<label><?php _e( 'Condition', 'wc-popups' ) ?></label>
 	        				
 	    					<select name="wc_popup_setting[condition]">
@@ -121,23 +143,22 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
 	    					</select>
 	        				
 	        			</div>
-	        			<div class='field-section'>
+	        			<div class="field-section  field-value <?php echo $type == 2? 'hide_field': '';?>">
 	        				<label><?php _e( 'Value', 'wc-popups' ) ?></label>
 	        				
 	    					<input type='number' name="wc_popup_setting[value]" value='<?php echo $options['value']; ?>' />
 	        				
 	        			</div>
-	        			<div class='field-section'>
+	        			<div class="field-section field-product <?php echo $type == 2? '': 'hide_field';?>">
 	        				<label><?php _e( 'Product', 'wc-popups' ) ?></label>
 	        				
-	    					<select name="wc_popup_setting[products]">
-	    						<option value=''><?php _e( 'Select Product', 'wc-popups' ) ?></option>
+	    					<select name="wc_popup_setting[products]" id='products'>
 	    						
 	    					</select>
 	        				
 	        			</div>
 	        			<div class='field-section'>
-	        				<input type='submit' value='Save' name='save' class='button button-primary' /> 
+	        				<input type='submit' value='Save' name='save' class='button button-secondary' /> 
 	        			</div>
 	        		</div>
         		</form>
