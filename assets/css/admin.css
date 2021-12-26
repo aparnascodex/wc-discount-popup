@@ -32,11 +32,11 @@
 .hide_field {
 	display: none;
 }
-.field-product input[type='radio'] {
+/*.field-product input[type='checkbox'] {
 	display: none;
-}
+}*/
 .field-product .sol-container {
-	width: 30% !important;
+	width: 35% !important;
 	display: inline-block;
 }
 .field-product .sol-inner-container{
@@ -47,4 +47,11 @@
 	width: 95% !important;
 	border-bottom: 1px solid rgb(226, 228, 231);
 	padding: 10px 0px; 
+}
+.field-product .sol-label-text {
+    padding-left: 35px !important;
+}
+.field-product  .sol-checkbox {
+    top: 10px !important;
+    margin: 0 10px !important;
 }

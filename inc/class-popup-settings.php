@@ -37,7 +37,15 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
 
         public function register_popup_settings() {
         	register_setting( 'wc_popup_setting', 'wc_popup_setting' );
+
+        	if( get_option( 'popup_redirect_after_activation', false ) && is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+
+        		delete_option( 'popup_redirect_after_activation' );
+    			exit( wp_redirect( admin_url( 'admin.php?page=wc-popup-settings' ) ) );
+
+    		}
         }
+
         public function register_popup_settings_menu() {
 
         	add_submenu_page( 'woocommerce', 
@@ -50,11 +58,13 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         }
 
         public function include_popup_settings_script( $hook ) {
+
         	if( $hook === 'woocommerce_page_wc-popup-settings' ) {
         		wp_enqueue_style( 'popup-admin-css', POPUP_PLUGIN_URL. 'assets/css/admin.css' );
         		wp_enqueue_style( 'sol-css', POPUP_PLUGIN_URL. 'assets/css/sol.css' );
         		wp_enqueue_script( 'sol-js', POPUP_PLUGIN_URL. 'assets/js/sol.js', ['jquery'] );
         		wp_enqueue_script( 'popup-admin-js', POPUP_PLUGIN_URL. 'assets/js/admin.js', ['jquery', 'sol-js'] );
+
         		$defaults = ['products'  => ''];
         		$options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
         		$selected_product = $options['products'];
@@ -75,6 +85,7 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
 	        	
 	        	wp_localize_script( 'popup-admin-js', 'opts', ['products' => $product_options] );
         	}
+
         }
         public function wc_popup_settings() {
         	$defaults = ['display'  => '',
@@ -152,8 +163,7 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
 	        			<div class="field-section field-product <?php echo $type == 2? '': 'hide_field';?>">
 	        				<label><?php _e( 'Product', 'wc-popups' ) ?></label>
 	        				
-	    					<select name="wc_popup_setting[products]" id='products'>
-	    						
+	    					<select name="wc_popup_setting[products][]" id='products' multiple="multiple">
 	    					</select>
 	        				
 	        			</div>

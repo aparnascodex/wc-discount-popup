@@ -23,8 +23,7 @@ require_once POPUP_PLUGIN_DIR.'/inc/class-popup-loader.php';
 
 register_activation_hook( POPUP_PLUGIN_FILE, 'redirect_to_settings_page' );
 function redirect_to_settings_page() {
-    //wp_redirect( admin_url( 'admin.php?page=wc-admin' )  );
-    //exit();
+    add_option( 'popup_redirect_after_activation', true );
 }
 
 

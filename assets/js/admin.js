@@ -10,7 +10,7 @@ jQuery(document).ready(function($){
 			$('.field-condition, .field-value').removeClass('hide_field');
 		}
 	});
-	console.log(opts.products)
+	
 	$('#products').searchableOptionList({
         maxHeight : '250px',
         allowNullSelection : true,

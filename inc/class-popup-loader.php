@@ -56,6 +56,7 @@ if ( ! class_exists( 'Popup_Loader' ) ) {
 
         public function files_loader() {
             require_once 'class-popup-settings.php';
+            require_once 'class-popup.php';
         }
     }
     Popup_Loader::get_instance();
