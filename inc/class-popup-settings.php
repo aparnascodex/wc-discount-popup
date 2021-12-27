@@ -35,17 +35,16 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
             add_action( 'admin_init', [$this, 'register_popup_settings'] );
         }
 
+        /**
+         * Register settings api fields for pop up setting
+         */
         public function register_popup_settings() {
         	register_setting( 'wc_popup_setting', 'wc_popup_setting' );
-
-        	if( get_option( 'popup_redirect_after_activation', false ) && is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
-
-        		delete_option( 'popup_redirect_after_activation' );
-    			exit( wp_redirect( admin_url( 'admin.php?page=wc-popup-settings' ) ) );
-
-    		}
         }
 
+        /**
+         * Define Pop up settings submenu under WooCommerce menu.
+         */
         public function register_popup_settings_menu() {
 
         	add_submenu_page( 'woocommerce', 
@@ -57,6 +56,9 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
 
         }
 
+        /**
+         * Load scripts only on pop up settings page.
+         */
         public function include_popup_settings_script( $hook ) {
 
         	if( $hook === 'woocommerce_page_wc-popup-settings' ) {
@@ -65,7 +67,7 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         		wp_enqueue_script( 'sol-js', POPUP_PLUGIN_URL. 'assets/js/sol.js', ['jquery'] );
         		wp_enqueue_script( 'popup-admin-js', POPUP_PLUGIN_URL. 'assets/js/admin.js', ['jquery', 'sol-js'] );
 
-        		$defaults = ['products'  => ''];
+        		$defaults = ['products'  => [], 'type' => ''];
         		$options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
         		$selected_product = $options['products'];
         		
@@ -74,6 +76,7 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         							'post_status' => 'publish',
         							'numberposts' => -1 ] );
 	        	$product_options = [];
+	        	
 	        	foreach( $products as $product ) {
 	        		$selected = in_array( $product->ID, $selected_product )? true: false;
 
@@ -88,6 +91,10 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         	}
 
         }
+
+        /**
+        * Pop up settings screen.
+        */
         public function wc_popup_settings() {
         	$defaults = ['display'  => '',
         				'type'      => '',

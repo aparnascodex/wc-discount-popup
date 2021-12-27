@@ -15,6 +15,8 @@ if ( ! class_exists( 'Popup_Loader' ) ) {
 
         /**
          * Gets an instance of our plugin.
+         * 
+         * @return class instance
          */
         public static function get_instance() {
 
@@ -36,9 +38,21 @@ if ( ! class_exists( 'Popup_Loader' ) ) {
 
         }
 
+        /**
+         * Show WooCommerce missing notice if the WooCommerce plugin is not active.
+         */
         public function check_dependency() {
             if( !is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
                 add_action( 'admin_notices', [$this, 'wdp_wc_missing_error'] );
+            }
+
+            //We have registed the pop up setting menu under WooCommerce menu. If the WooCommerce plugin is not active then don't redirect user, as it will throw the page not found error.
+            
+            if( get_option( 'popup_redirect_after_activation', false ) && is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+
+                delete_option( 'popup_redirect_after_activation' );
+                exit( wp_redirect( admin_url( 'admin.php?page=wc-popup-settings' ) ) );
+
             }
         }
 
@@ -54,6 +68,9 @@ if ( ! class_exists( 'Popup_Loader' ) ) {
             <?php
         }
 
+        /**
+        * Include plugin files.
+        */
         public function files_loader() {
             require_once 'class-popup-settings.php';
             require_once 'class-popup.php';

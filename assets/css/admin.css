@@ -18,6 +18,8 @@
 	font-weight: 600;
 	font-size: 14px;
 	display:  inline-block;
+	vertical-align: top;
+    margin-top: 13px;
 
 }
 .field-section select, .field-section input[type='number']{

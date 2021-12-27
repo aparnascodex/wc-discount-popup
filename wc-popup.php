@@ -21,6 +21,7 @@ define( 'POPUP_VERSION', '1.0.0' );
 
 require_once POPUP_PLUGIN_DIR.'/inc/class-popup-loader.php';
 
+//Save redirection value on plugin activation.
 register_activation_hook( POPUP_PLUGIN_FILE, 'redirect_to_settings_page' );
 function redirect_to_settings_page() {
     add_option( 'popup_redirect_after_activation', true );
