@@ -12,7 +12,7 @@ jQuery(document).ready(function($){
 	})
 
 	$('.apply-code').click(function(){
-		modalContainer.removeClass('show-modal');
+		
 		$.ajax({
 			url: popup.url,
 			method: 'post',
@@ -21,6 +21,7 @@ jQuery(document).ready(function($){
 				nonce: popup.popup_nonce 
 			},
 			success: function( response ) {
+				modalContainer.removeClass('show-modal');
 				location.reload();
 			},
 			error: function( error ) {
