@@ -29,59 +29,57 @@ if ( ! class_exists( 'Popup' ) ) {
          * Constructor.
          */
         public function __construct() {
-
+            add_action( 'wp_enqueue_scripts', [$this, 'load_scripts'] );
             add_action( 'woocommerce_after_cart', [$this, 'include_popup_content'] );
             add_action( 'wp_ajax_get_cart_details_for_popup', [$this, 'get_cart_details_for_popup'] );
             add_action( 'wp_ajax_nopriv_get_cart_details_for_popup', [$this, 'get_cart_details_for_popup'] );
 
         }
 
+        public function load_scripts() {
+            if( is_cart() ) {
+                $options = $this->get_popup_settings();
+
+                if( $options['display'] == 1) {
+                    $render_popup = $this->should_render_popup();
+                
+                    wp_enqueue_style( 'popup-css', POPUP_PLUGIN_URL. 'assets/css/styles.css' );
+                    wp_enqueue_script( 'popup-js', POPUP_PLUGIN_URL. 'assets/js/popup.js', ['jquery'] );
+                    wp_localize_script( 'popup-js', 'popup', [ 'options' => $options, 'display' => $render_popup, 'url' => admin_url( 'admin-ajax.php' )] );
+                }
+            }
+        }
         public function include_popup_content() {
-            $defaults = ['display'  => '',
-                        'type'      => '',
-                        'condition' => '',
-                        'value'     => '',
-                        'products'  => ''
-                    ];
-            $options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
-            $render_popup = $this->should_render_popup();
-            
-            wp_enqueue_style( 'popup-css', POPUP_PLUGIN_URL. 'assets/css/styles.css' );
-            wp_enqueue_script( 'popup-js', POPUP_PLUGIN_URL. 'assets/js/popup.js', ['jquery'] );
-            wp_localize_script( 'popup-js', 'popup', [ 'options' => $options, 'display' => $render_popup, 'url' => admin_url( 'admin-ajax.php' )] );
-            ?>
-            <section class="modal container">
-            <div class="modal__container" id="popup-container">
-                <div class="modal__content">
-                    <div class="modal__close close-modal" title="Close">
-                        <i class='bx bx-x'></i>
+            $options = $this->get_popup_settings();
+
+            if( $options['display'] == 1) {
+                ?>
+                <section class="modal container">
+                <div class="modal__container" id="popup-container">
+                    <div class="modal__content">
+                        
+                        <img src="<?php echo POPUP_PLUGIN_URL. 'assets/img/gift.png';?>" alt="" class="modal__img">
+                        <h1 class="modal__title">Get 15% coupon now</h1>
+                        <p class="modal__description">Enjoy our amazing products for a 15% discount code</p>
+
+                        <button class="modal__button apply-code modal__button-width">
+                            Apply Code
+                        </button>
+
+                        <button class="modal__button-link close-modal">
+                            Close
+                        </button>
                     </div>
-
-                    <h1 class="modal__title">Good Job!</h1>
-                    <p class="modal__description">Click the button to close</p>
-
-                    <button class="modal__button modal__button-width">
-                        View status
-                    </button>
-
-                    <button class="modal__button-link close-modal">
-                        Close
-                    </button>
                 </div>
-            </div>
-            </section>
-            <?php
+                </section>
+                <?php
+            }
             
         }
 
         public function should_render_popup() {
-            $defaults = ['display'  => '',
-                        'type'      => '',
-                        'condition' => '',
-                        'value'     => '',
-                        'products'  => ''
-                    ];
-            $options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
+           
+            $options = $this->get_popup_settings();
 
             $render_popup = 0;
             if( $options['display'] == 1) {
@@ -130,6 +128,18 @@ if ( ! class_exists( 'Popup' ) ) {
             echo $render_popup = $this->should_render_popup();
             die();
         }
+
+        public function get_popup_settings() {
+            $defaults = ['display'  => '',
+                        'type'      => '',
+                        'condition' => '',
+                        'value'     => '',
+                        'products'  => ''
+                    ];
+            $options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
+            return $options;
+        }
+        
     }
     Popup::get_instance();
 }
