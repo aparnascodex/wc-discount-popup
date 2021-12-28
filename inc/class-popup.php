@@ -45,14 +45,19 @@ if ( ! class_exists( 'Popup' ) ) {
         }
 
         /**
-         * Remove discount variable from WC session if the discount is no longer valid
-         *
+         * Get pop up settings
+         * 
+         * @return array $options
          */
-        public function reset_session() {
-            $render_popup = $this->is_discount_applicable();
-            if($render_popup == 0 && WC()->session->__isset( 'custom_discount' ) ) {
-                WC()->session->__unset( 'custom_discount' );
-            }
+        public function get_popup_settings() {
+            $defaults = ['display'  => '',
+                        'type'      => '',
+                        'condition' => '',
+                        'value'     => '',
+                        'products'  => ''
+                    ];
+            $options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
+            return $options;
         }
 
         /**
@@ -109,6 +114,18 @@ if ( ! class_exists( 'Popup' ) ) {
             }
             
         }
+
+        /**
+         * Remove discount variable from WC session if the discount is no longer valid
+         *
+         */
+        public function reset_session() {
+            $render_popup = $this->is_discount_applicable();
+            if($render_popup == 0 && WC()->session->__isset( 'custom_discount' ) ) {
+                WC()->session->__unset( 'custom_discount' );
+            }
+        }
+
 
         /**
          * Check whether cart items satisfies the pop up condition and return pop up flag
@@ -229,21 +246,7 @@ if ( ! class_exists( 'Popup' ) ) {
             }
         }
 
-        /**
-         * Get pop up settings
-         * 
-         * @return array $options
-         */
-        public function get_popup_settings() {
-            $defaults = ['display'  => '',
-                        'type'      => '',
-                        'condition' => '',
-                        'value'     => '',
-                        'products'  => ''
-                    ];
-            $options = wp_parse_args( get_option( 'wc_popup_setting'), $defaults );
-            return $options;
-        }
+        
         
     }
     Popup::get_instance();

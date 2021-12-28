@@ -47,12 +47,14 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
          */
         public function register_popup_settings_menu() {
 
-        	add_submenu_page( 'woocommerce', 
+        	add_menu_page( 
         		__( 'Popup Settings', 'wc-popups' ),
         		__( 'Popup Settings', 'wc-popups' ),
         		'manage_options', 
         		'wc-popup-settings', 
-        		[$this, 'wc_popup_settings'] );
+        		[$this, 'wc_popup_settings'],
+        		'',
+        		57 );  //55.5 is WC menu position
 
         }
 
@@ -60,8 +62,8 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
          * Load scripts only on pop up settings page.
          */
         public function include_popup_settings_script( $hook ) {
-
-        	if( $hook === 'woocommerce_page_wc-popup-settings' ) {
+        	
+        	if( $hook === 'toplevel_page_wc-popup-settings' ) {
         		wp_enqueue_style( 'popup-admin-css', POPUP_PLUGIN_URL. 'assets/css/admin.css' );
         		wp_enqueue_style( 'sol-css', POPUP_PLUGIN_URL. 'assets/css/sol.css' );
         		wp_enqueue_script( 'sol-js', POPUP_PLUGIN_URL. 'assets/js/sol.js', ['jquery'] );
@@ -107,9 +109,18 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         	
         	?>
         	<div class='popup-settings'>
+
+        		<?php
+        		if( !is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+                	$this->wdp_wc_missing_error();
+           		}
+        		?>
+
         		<div class='heading'>
         			<h3><?php _e( 'Popup Settings', 'wc-popups' ); ?></h3>
         		</div>
+
+        		
         		<div class='content'>
         			<form method="post" action="options.php">
         				<?php settings_fields( 'wc_popup_setting' ); ?>
@@ -182,6 +193,18 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         		</form>
         	</div>
         	<?php
+        }
+
+        public function wdp_wc_missing_error() {
+            ?>
+            <div class="error">
+                <p>
+                    <?php 
+                    printf( __( '<b>"WooCommerce Discount Popup" </b> requires WooCommerce to be active and installed. Please ensure that WooCommerce version %1$s or higher is active.', 'wc-popups' ), WC_VERSION_REQUIRED ); 
+                    ?>
+                </p>
+              </div>
+            <?php
         }
     }
 
