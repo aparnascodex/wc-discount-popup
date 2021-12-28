@@ -67,16 +67,15 @@ if ( ! class_exists( 'Popup' ) ) {
          * 
          */
         public function load_scripts() {
-            if( is_cart() ) {
-                $options = $this->get_popup_settings();
+            if( WC_ACTIVE && is_cart() ) {
 
-                if( $options['display'] == 1) {
-                    $render_popup = $this->is_discount_applicable() && !WC()->session->__isset( 'custom_discount' );
+                $options = $this->get_popup_settings();
+                $render_popup = $this->is_discount_applicable() && !WC()->session->__isset( 'custom_discount' );
+            
+                wp_enqueue_style( 'popup-css', POPUP_PLUGIN_URL. 'assets/css/styles.css' );
+                wp_enqueue_script( 'popup-js', POPUP_PLUGIN_URL. 'assets/js/popup.js', ['jquery'] );
+                wp_localize_script( 'popup-js', 'popup', [ 'options' => $options, 'display' => $render_popup, 'url' => admin_url( 'admin-ajax.php' ), 'popup_nonce' => wp_create_nonce( 'discount_nonce' )] );
                 
-                    wp_enqueue_style( 'popup-css', POPUP_PLUGIN_URL. 'assets/css/styles.css' );
-                    wp_enqueue_script( 'popup-js', POPUP_PLUGIN_URL. 'assets/js/popup.js', ['jquery'] );
-                    wp_localize_script( 'popup-js', 'popup', [ 'options' => $options, 'display' => $render_popup, 'url' => admin_url( 'admin-ajax.php' ), 'popup_nonce' => wp_create_nonce( 'discount_nonce' )] );
-                }
             }
         }
 
@@ -85,34 +84,26 @@ if ( ! class_exists( 'Popup' ) ) {
          * 
          */
         public function include_popup_content() {
-            $options = $this->get_popup_settings();
+            ?>
+            <section class="modal container">
+            <div class="modal__container" id="popup-container">
+                <div class="modal__content">
+                    
+                    <img src="<?php echo POPUP_PLUGIN_URL. 'assets/img/gift.png';?>" alt="" class="modal__img">
+                    <h1 class="modal__title">Get 15% coupon now</h1>
+                    <p class="modal__description">Enjoy our amazing products for a 15% discount code</p>
 
-            if( $options['display'] == 1) {
-                
-                ?>
-                <section class="modal container">
-                <div class="modal__container" id="popup-container">
-                    <div class="modal__content">
-                        
-                        <img src="<?php echo POPUP_PLUGIN_URL. 'assets/img/gift.png';?>" alt="" class="modal__img">
-                        <h1 class="modal__title">Get 15% coupon now</h1>
-                        <p class="modal__description">Enjoy our amazing products for a 15% discount code</p>
+                    <button class="modal__button apply-code modal__button-width">
+                        Apply Code
+                    </button>
 
-                        <button class="modal__button apply-code modal__button-width">
-                            Apply Code
-                        </button>
-
-                        <button class="modal__button-link close-modal">
-                            Close
-                        </button>
-                    </div>
+                    <button class="modal__button-link close-modal">
+                        Close
+                    </button>
                 </div>
-                </section>
-                <?php
-
-            
-            }
-            
+            </div>
+            </section>
+            <?php
         }
 
         /**
@@ -137,55 +128,56 @@ if ( ! class_exists( 'Popup' ) ) {
             $options = $this->get_popup_settings();
 
             $render_popup = 0;
-            if( $options['display'] == 1) {
-               
-                $type = $options['type'];
-                $condition =  $options['condition'];
-                $value =  $options['value'];
 
-                if( $options['type'] == 0 ) {
+            $type = $options['type'];
+            $condition =  $options['condition'];
+            $value =  $options['value'];
+            $is_valid = 0;
+            if( $options['type'] == 0 ) {
 
-                    // discount type is cart totals. Get cart total and compare it with settings value.
+                // discount type is cart totals. Get cart total and compare it with settings value.
 
-                    $cart_total =  WC()->cart->subtotal;
+                $cart_total =  WC()->cart->subtotal;
 
-                    if( $condition == 0 && $cart_total >= $value) {
-                        $render_popup = 1;
-                    }
-                    elseif( $condition == 1 && $cart_total == $value) {
-                        $render_popup = 1;
-                    }
-                    elseif( $condition == 2 && $cart_total < $value) {
-                        $render_popup = 1;
-                    }
+                if( $condition == 0 && $cart_total >= $value) {
+                    $is_valid = 1;
                 }
-                elseif( $options['type'] == 1 ) {
-
-                    // discount type is number of cart items. Get total number of products in cart and compare it with settings value.
-
-                    $cart_product_count =  WC()->cart->get_cart_contents_count();
-                    if( $condition == 0 && $cart_product_count >= $value) {
-                        $render_popup = 1;
-                    }
-                    elseif( $condition == 1 && $cart_product_count == $value) {
-                        $render_popup = 1;
-                    }
-                    elseif( $condition == 2 && $cart_product_count < $value) {
-                        $render_popup = 1;
-                    }
+                elseif( $condition == 1 && $cart_total == $value) {
+                    $is_valid = 1;
                 }
-                elseif( $options['type'] == 2 ) {
-
-                    // discount type is products in cart. Match items in cart with selected products in settings.
-
-                    $products = $options['products'];
-                    $product_ids = wp_list_pluck( WC()->cart->get_cart_contents(), 'product_id' );
-                    $common = array_intersect( $products, $product_ids );
-                    if( is_array($common) && count($common) >= 1 ){
-                        $render_popup = 1;
-                    }
-
+                elseif( $condition == 2 && $cart_total < $value) {
+                    $is_valid = 1;
                 }
+            }
+            elseif( $options['type'] == 1 ) {
+
+                // discount type is number of cart items. Get total number of products in cart and compare it with settings value.
+
+                $cart_product_count =  WC()->cart->get_cart_contents_count();
+                if( $condition == 0 && $cart_product_count >= $value) {
+                    $is_valid = 1;
+                }
+                elseif( $condition == 1 && $cart_product_count == $value) {
+                    $is_valid = 1;
+                }
+                elseif( $condition == 2 && $cart_product_count < $value) {
+                    $is_valid = 1;
+                }
+            }
+            elseif( $options['type'] == 2 ) {
+
+                // discount type is products in cart. Match items in cart with selected products in settings.
+
+                $products = $options['products'];
+                $product_ids = wp_list_pluck( WC()->cart->get_cart_contents(), 'product_id' );
+                $common = array_intersect( $products, $product_ids );
+                if( is_array($common) && count($common) >= 1 ){
+                    $is_valid = 1;
+                }
+
+            }
+            if( ( $options['display'] == 1 && $is_valid == 1 ) ||  ($options['display'] == 0 && $is_valid == 0 ) ) {
+                $render_popup = 1;
             }
             return $render_popup;
         }
