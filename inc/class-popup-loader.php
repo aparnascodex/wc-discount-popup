@@ -47,7 +47,7 @@ if ( ! class_exists( 'Popup_Loader' ) ) {
             
             if( get_option( 'popup_redirect_after_activation', false ) ) {
 
-                delete_option( 'popup_redirect_after_activation' );
+                update_option( 'popup_redirect_after_activation', false );
                 exit( wp_redirect( admin_url( 'admin.php?page=wc-popup-settings' ) ) );
 
             }
