@@ -18,7 +18,7 @@ define( 'POPUP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'POPUP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WC_VERSION_REQUIRED', '5.2.1' );
 define( 'POPUP_VERSION', '1.0.1' );
-define( 'WC_ACTIVE' , is_plugin_active( 'woocommerce/woocommerce.php' ) );
+
 require_once POPUP_PLUGIN_DIR.'/inc/class-popup-loader.php';
 
 //Save redirection value on plugin activation.

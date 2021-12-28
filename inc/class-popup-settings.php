@@ -111,7 +111,7 @@ if ( ! class_exists( 'Popup_Settings' ) ) {
         	<div class='popup-settings'>
 
         		<?php
-        		if( ! WC_ACTIVE ) {
+        		if( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
                 	$this->wdp_wc_missing_error();
            		}
         		?>

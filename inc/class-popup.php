@@ -67,7 +67,7 @@ if ( ! class_exists( 'Popup' ) ) {
          * 
          */
         public function load_scripts() {
-            if( WC_ACTIVE && is_cart() ) {
+            if( function_exists( 'is_cart' ) && is_cart() ) {
 
                 $options = $this->get_popup_settings();
                 $render_popup = $this->is_discount_applicable() && !WC()->session->__isset( 'custom_discount' );
